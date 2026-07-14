@@ -1,0 +1,2 @@
+com.example.msakafka.common.kafka.KafkaProducerConfig
+com.example.msakafka.common.kafka.KafkaConsumerConfig
