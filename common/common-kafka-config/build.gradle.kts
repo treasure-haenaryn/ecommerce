@@ -13,4 +13,5 @@ dependencies {
     api(project(":common:common-events"))
     api("org.springframework.kafka:spring-kafka")
     api("org.springframework.boot:spring-boot-autoconfigure")
+    api("tools.jackson.core:jackson-databind")
 }
