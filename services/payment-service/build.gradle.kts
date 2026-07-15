@@ -4,6 +4,12 @@ plugins {
     id("io.spring.dependency-management")
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("me.paulschwarz:spring-dotenv-bom:5.1.0")
+    }
+}
+
 dependencies {
     implementation(project(":common:common-events"))
     implementation(project(":common:common-kafka-config"))
@@ -14,9 +20,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.kafka:spring-kafka")
 
-    runtimeOnly("com.h2database:h2")
+    developmentOnly("me.paulschwarz:springboot4-dotenv")
+
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.kafka:spring-kafka-test")
+}
+
+tasks.named<JavaExec>("bootRun") {
+    workingDir = rootProject.projectDir
 }
