@@ -25,8 +25,11 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<OrderResponse>> createOrder(@Valid @RequestBody CreateOrderRequest request) {
-        Order order = orderService.createOrder(request.customerId(), request.amount());
-        OrderResponse response = new OrderResponse(order.getId(), order.getCustomerId(), order.getAmount(), order.getStatus());
+        Order order = orderService.createOrder(
+                request.customerId(), request.productId(), request.quantity(), request.amount());
+        OrderResponse response = new OrderResponse(
+                order.getId(), order.getCustomerId(), order.getProductId(), order.getQuantity(),
+                order.getAmount(), order.getStatus());
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of(response, "주문이 생성되었습니다."));
     }
 }

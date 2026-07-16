@@ -38,11 +38,12 @@ public class OrderService {
     }
 
     @Transactional
-    public Order createOrder(String customerId, BigDecimal amount) {
-        Order order = Order.create(customerId, amount);
+    public Order createOrder(String customerId, String productId, int quantity, BigDecimal amount) {
+        Order order = Order.create(customerId, productId, quantity, amount);
         orderRepository.save(order);
 
-        OrderCreatedPayload payload = new OrderCreatedPayload(order.getId(), customerId, amount);
+        OrderCreatedPayload payload =
+                new OrderCreatedPayload(order.getId(), customerId, amount, productId, quantity);
         saveOutboxEvent("Order", order.getId(), EventTypes.ORDER_CREATED, payload);
 
         return order;

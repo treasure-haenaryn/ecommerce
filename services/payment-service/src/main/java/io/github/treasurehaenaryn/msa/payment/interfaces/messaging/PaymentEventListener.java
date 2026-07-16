@@ -25,6 +25,7 @@ public class PaymentEventListener {
     @KafkaListener(topics = KafkaTopics.ORDER_CREATED)
     public void onOrderCreated(EventEnvelope<?> envelope) {
         OrderCreatedPayload payload = objectMapper.convertValue(envelope.payload(), OrderCreatedPayload.class);
-        paymentService.handleOrderCreated(envelope.eventId(), payload.orderId(), payload.amount());
+        paymentService.handleOrderCreated(
+                envelope.eventId(), payload.orderId(), payload.amount(), payload.productId(), payload.quantity());
     }
 }

@@ -38,7 +38,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void handleOrderCreated(String eventId, String orderId, BigDecimal amount) {
+    public void handleOrderCreated(String eventId, String orderId, BigDecimal amount, String productId, int quantity) {
         if (processedEventRepository.existsById(eventId)) {
             return;
         }
@@ -50,8 +50,9 @@ public class PaymentService {
             saveOutboxEvent("Payment", orderId, EventTypes.PAYMENT_FAILED,
                     new PaymentFailedPayload(orderId, payment.getFailureReason()));
         } else {
+            // productId/quantity는 Inventory Service가 재고 차감에 필요해서 그대로 실어나른다.
             saveOutboxEvent("Payment", orderId, EventTypes.PAYMENT_COMPLETED,
-                    new PaymentCompletedPayload(orderId, payment.getId()));
+                    new PaymentCompletedPayload(orderId, payment.getId(), productId, quantity));
         }
 
         processedEventRepository.save(new ProcessedEvent(eventId));

@@ -11,6 +11,8 @@ import java.math.BigDecimal;
  */
 public record CreateOrderRequest(
         @NotBlank String customerId,
+        @NotBlank String productId,
+        @Positive int quantity,
         @NotNull @Positive BigDecimal amount
 ) {
 }

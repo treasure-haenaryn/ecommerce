@@ -25,6 +25,12 @@ public class Order {
     private String customerId;
 
     @Column(nullable = false)
+    private String productId;
+
+    @Column(nullable = false)
+    private int quantity;
+
+    @Column(nullable = false)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -39,17 +45,21 @@ public class Order {
     protected Order() {
     }
 
-    private Order(String id, String customerId, BigDecimal amount, OrderStatus status, Instant createdAt) {
+    private Order(String id, String customerId, String productId, int quantity, BigDecimal amount,
+                  OrderStatus status, Instant createdAt) {
         this.id = id;
         this.customerId = customerId;
+        this.productId = productId;
+        this.quantity = quantity;
         this.amount = amount;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }
 
-    public static Order create(String customerId, BigDecimal amount) {
-        return new Order(UUID.randomUUID().toString(), customerId, amount, OrderStatus.CREATED, Instant.now());
+    public static Order create(String customerId, String productId, int quantity, BigDecimal amount) {
+        return new Order(UUID.randomUUID().toString(), customerId, productId, quantity, amount,
+                OrderStatus.CREATED, Instant.now());
     }
 
     public void cancel() {
@@ -68,6 +78,14 @@ public class Order {
 
     public String getCustomerId() {
         return customerId;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public int getQuantity() {
+        return quantity;
     }
 
     public BigDecimal getAmount() {

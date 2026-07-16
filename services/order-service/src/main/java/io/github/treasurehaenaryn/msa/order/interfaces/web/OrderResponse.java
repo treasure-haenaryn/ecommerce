@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 public record OrderResponse(
         String orderId,
         String customerId,
+        String productId,
+        int quantity,
         BigDecimal amount,
         OrderStatus status
 ) {
