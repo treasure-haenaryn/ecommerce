@@ -200,3 +200,12 @@ gradle-app.setting
 ### Gradle Patch ###
 # Java heap dump
 *.hprof
+
+### 프로젝트 추가 규칙 ###
+# 민감 정보가 담긴 환경변수 파일 (실제 값은 .env, 템플릿은 .env.example로 커밋)
+.env
+.env.*
+!.env.example
+
+# 리팩토링 과정에서 남긴 이전 버전 참고용 코드 (커밋 대상 아님)
+_deprecated-events-v1/
