@@ -27,3 +27,11 @@ management:
     web:
       exposure:
         include: health,info
+  tracing:
+    sampling:
+      probability: 1.0   # 로컬 검증 단계라 100% 샘플링 (운영에서는 낮춰야 함)
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/traces

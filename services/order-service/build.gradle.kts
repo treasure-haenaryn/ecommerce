@@ -18,6 +18,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     implementation("org.springframework.kafka:spring-kafka")
 
     // 로컬 실행 시 루트 .env 파일을 자동으로 읽어 Spring Environment에 주입 (운영 배포 시에는 실제 환경변수/Secret이 우선 적용됨)

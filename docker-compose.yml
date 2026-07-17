@@ -44,5 +44,13 @@ services:
       - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql   # 서비스별 DB 5개 생성
       - postgres-data:/var/lib/postgresql/data
 
+  grafana-lgtm:
+    image: grafana/otel-lgtm:latest   # Loki(로그)+Grafana(시각화)+Tempo(트레이스)+Prometheus(메트릭) 올인원, 로컬 검증용
+    container_name: grafana-lgtm
+    ports:
+      - "3000:3000"   # Grafana UI
+      - "4317:4317"   # OTLP gRPC 수신
+      - "4318:4318"   # OTLP HTTP 수신
+
 volumes:
   postgres-data:
