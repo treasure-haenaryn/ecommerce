@@ -6,7 +6,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.example.msakafka"
+    group = "io.github.treasurehaenaryn.msa"
     version = "0.1.0-SNAPSHOT"
 
     repositories {
