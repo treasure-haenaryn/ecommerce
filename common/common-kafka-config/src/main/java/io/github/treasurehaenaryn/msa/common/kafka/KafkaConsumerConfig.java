@@ -61,6 +61,8 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setCommonErrorHandler(kafkaErrorHandler);
+        // Micrometer Observation을 켜야 구독 시 메시지 헤더의 traceparent를 읽어서 같은 Trace로 이어붙임
+        factory.getContainerProperties().setObservationEnabled(true);
         return factory;
     }
 }
