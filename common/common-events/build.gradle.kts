@@ -10,6 +10,7 @@ dependencyManagement {
 }
 
 dependencies {
+    // jackson-annotations만 예외적으로 com.fasterxml.jackson 그룹에 그대로 남아있음 (2.x/3.x 공용)
     api("com.fasterxml.jackson.core:jackson-annotations")
-    api("com.fasterxml.jackson.core:jackson-databind")
+    api("tools.jackson.core:jackson-databind")
 }
