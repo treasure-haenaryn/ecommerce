@@ -3,6 +3,7 @@ package io.github.treasurehaenaryn.msa.order.application;
 import io.github.treasurehaenaryn.msa.common.events.EventTypes;
 import io.github.treasurehaenaryn.msa.common.events.payload.OrderCompletedPayload;
 import io.github.treasurehaenaryn.msa.common.events.payload.OrderCreatedPayload;
+import io.github.treasurehaenaryn.msa.common.kafka.TraceContextCarrier;
 import io.github.treasurehaenaryn.msa.order.domain.Order;
 import io.github.treasurehaenaryn.msa.order.infrastructure.persistence.OrderRepository;
 import io.github.treasurehaenaryn.msa.order.infrastructure.persistence.OutboxEvent;
@@ -26,15 +27,18 @@ public class OrderService {
     private final OutboxEventRepository outboxEventRepository;
     private final ProcessedEventRepository processedEventRepository;
     private final ObjectMapper objectMapper;
+    private final TraceContextCarrier traceContextCarrier;
 
     public OrderService(OrderRepository orderRepository,
                          OutboxEventRepository outboxEventRepository,
                          ProcessedEventRepository processedEventRepository,
-                         ObjectMapper objectMapper) {
+                         ObjectMapper objectMapper,
+                         TraceContextCarrier traceContextCarrier) {
         this.orderRepository = orderRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.processedEventRepository = processedEventRepository;
         this.objectMapper = objectMapper;
+        this.traceContextCarrier = traceContextCarrier;
     }
 
     @Transactional
@@ -97,7 +101,8 @@ public class OrderService {
     private void saveOutboxEvent(String aggregateType, String aggregateId, String eventType, Object payload) {
         try {
             String payloadJson = objectMapper.writeValueAsString(payload);
-            outboxEventRepository.save(OutboxEvent.create(aggregateType, aggregateId, eventType, payloadJson));
+            String traceparent = traceContextCarrier.capture();
+            outboxEventRepository.save(OutboxEvent.create(aggregateType, aggregateId, eventType, payloadJson, traceparent));
         } catch (JacksonException e) {
             throw new IllegalStateException("Outbox payload 직렬화 실패: " + eventType, e);
         }

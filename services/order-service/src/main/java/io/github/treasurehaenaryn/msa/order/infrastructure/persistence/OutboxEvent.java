@@ -33,6 +33,8 @@ public class OutboxEvent {
     @Column(nullable = false)
     private String payload;
 
+    private String traceparent;
+
     @Column(nullable = false)
     private Instant createdAt;
 
@@ -44,18 +46,22 @@ public class OutboxEvent {
     protected OutboxEvent() {
     }
 
-    private OutboxEvent(String id, String aggregateType, String aggregateId, String eventType, String payload) {
+    private OutboxEvent(String id, String aggregateType, String aggregateId, String eventType, String payload,
+                         String traceparent) {
         this.id = id;
         this.aggregateType = aggregateType;
         this.aggregateId = aggregateId;
         this.eventType = eventType;
         this.payload = payload;
+        this.traceparent = traceparent;
         this.createdAt = Instant.now();
         this.published = false;
     }
 
-    public static OutboxEvent create(String aggregateType, String aggregateId, String eventType, String payload) {
-        return new OutboxEvent(UUID.randomUUID().toString(), aggregateType, aggregateId, eventType, payload);
+    public static OutboxEvent create(String aggregateType, String aggregateId, String eventType, String payload,
+                                      String traceparent) {
+        return new OutboxEvent(UUID.randomUUID().toString(), aggregateType, aggregateId, eventType, payload,
+                traceparent);
     }
 
     public void markPublished() {
@@ -77,6 +83,10 @@ public class OutboxEvent {
 
     public String getPayload() {
         return payload;
+    }
+
+    public String getTraceparent() {
+        return traceparent;
     }
 
     public Instant getCreatedAt() {
