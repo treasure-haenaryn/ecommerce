@@ -37,9 +37,6 @@ public class KafkaProducerConfig {
 
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
-        KafkaTemplate<String, Object> template = new KafkaTemplate<>(producerFactory);
-        // Micrometer Observation을 켜야 발행 시 trace context(traceparent)를 메시지 헤더에 실어 보냄
-        template.setObservationEnabled(true);
-        return template;
+        return new KafkaTemplate<>(producerFactory);
     }
 }

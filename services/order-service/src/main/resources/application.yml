@@ -14,7 +14,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false   # SQL 로깅은 logback-spring.xml(org.hibernate.SQL 로거)이 담당 - Outbox 폴링 쿼리만 필터로 제외됨
     open-in-view: false
 
   kafka:
