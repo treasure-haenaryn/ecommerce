@@ -4,6 +4,7 @@ import io.github.treasurehaenaryn.msa.common.events.EventEnvelope;
 import io.github.treasurehaenaryn.msa.common.events.KafkaTopics;
 import io.github.treasurehaenaryn.msa.common.events.payload.InventoryReservedPayload;
 import io.github.treasurehaenaryn.msa.shipping.application.ShippingService;
+import io.opentelemetry.api.trace.Span;
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,7 @@ public class ShippingEventListener {
     @KafkaListener(topics = KafkaTopics.INVENTORY_RESERVED)
     public void onInventoryReserved(EventEnvelope<?> envelope) {
         InventoryReservedPayload payload = objectMapper.convertValue(envelope.payload(), InventoryReservedPayload.class);
+        Span.current().setAttribute("orderId", payload.orderId());
         shippingService.handleInventoryReserved(envelope.eventId(), payload.orderId());
     }
 }
