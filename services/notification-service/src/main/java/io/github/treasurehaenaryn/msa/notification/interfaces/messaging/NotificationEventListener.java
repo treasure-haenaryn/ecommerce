@@ -7,6 +7,7 @@ import io.github.treasurehaenaryn.msa.common.events.payload.OrderCompletedPayloa
 import io.github.treasurehaenaryn.msa.common.events.payload.OrderCreatedPayload;
 import io.github.treasurehaenaryn.msa.common.events.payload.PaymentFailedPayload;
 import io.github.treasurehaenaryn.msa.notification.application.NotificationService;
+import io.opentelemetry.api.trace.Span;
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -28,12 +29,14 @@ public class NotificationEventListener {
     @KafkaListener(topics = KafkaTopics.ORDER_CREATED)
     public void onOrderCreated(EventEnvelope<?> envelope) {
         OrderCreatedPayload payload = objectMapper.convertValue(envelope.payload(), OrderCreatedPayload.class);
+        Span.current().setAttribute("orderId", payload.orderId());
         notificationService.notifyOrderCreated(envelope.eventId(), payload.orderId());
     }
 
     @KafkaListener(topics = KafkaTopics.PAYMENT_FAILED)
     public void onPaymentFailed(EventEnvelope<?> envelope) {
         PaymentFailedPayload payload = objectMapper.convertValue(envelope.payload(), PaymentFailedPayload.class);
+        Span.current().setAttribute("orderId", payload.orderId());
         notificationService.notifyPaymentFailed(envelope.eventId(), payload.orderId(), payload.reason());
     }
 
@@ -41,12 +44,14 @@ public class NotificationEventListener {
     public void onInventoryReservationFailed(EventEnvelope<?> envelope) {
         InventoryReservationFailedPayload payload =
                 objectMapper.convertValue(envelope.payload(), InventoryReservationFailedPayload.class);
+        Span.current().setAttribute("orderId", payload.orderId());
         notificationService.notifyInventoryReservationFailed(envelope.eventId(), payload.orderId(), payload.reason());
     }
 
     @KafkaListener(topics = KafkaTopics.ORDER_COMPLETED)
     public void onOrderCompleted(EventEnvelope<?> envelope) {
         OrderCompletedPayload payload = objectMapper.convertValue(envelope.payload(), OrderCompletedPayload.class);
+        Span.current().setAttribute("orderId", payload.orderId());
         notificationService.notifyOrderCompleted(envelope.eventId(), payload.orderId());
     }
 }

@@ -6,6 +6,7 @@ import io.github.treasurehaenaryn.msa.common.events.payload.InventoryReservation
 import io.github.treasurehaenaryn.msa.common.events.payload.PaymentFailedPayload;
 import io.github.treasurehaenaryn.msa.common.events.payload.ShippingStartedPayload;
 import io.github.treasurehaenaryn.msa.order.application.OrderService;
+import io.opentelemetry.api.trace.Span;
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ public class OrderEventListener {
     @KafkaListener(topics = KafkaTopics.PAYMENT_FAILED)
     public void onPaymentFailed(EventEnvelope<?> envelope) {
         PaymentFailedPayload payload = objectMapper.convertValue(envelope.payload(), PaymentFailedPayload.class);
+        Span.current().setAttribute("orderId", payload.orderId());
         orderService.handlePaymentFailed(envelope.eventId(), payload.orderId());
     }
 
@@ -36,12 +38,14 @@ public class OrderEventListener {
     public void onInventoryReservationFailed(EventEnvelope<?> envelope) {
         InventoryReservationFailedPayload payload =
                 objectMapper.convertValue(envelope.payload(), InventoryReservationFailedPayload.class);
+        Span.current().setAttribute("orderId", payload.orderId());
         orderService.handleInventoryReservationFailed(envelope.eventId(), payload.orderId());
     }
 
     @KafkaListener(topics = KafkaTopics.SHIPPING_STARTED)
     public void onShippingStarted(EventEnvelope<?> envelope) {
         ShippingStartedPayload payload = objectMapper.convertValue(envelope.payload(), ShippingStartedPayload.class);
+        Span.current().setAttribute("orderId", payload.orderId());
         orderService.handleShippingStarted(envelope.eventId(), payload.orderId());
     }
 }

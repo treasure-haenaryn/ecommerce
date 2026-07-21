@@ -2,6 +2,7 @@ package io.github.treasurehaenaryn.msa.order.interfaces.web;
 
 import io.github.treasurehaenaryn.msa.order.application.OrderService;
 import io.github.treasurehaenaryn.msa.order.domain.Order;
+import io.opentelemetry.api.trace.Span;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> createOrder(@Valid @RequestBody CreateOrderRequest request) {
         Order order = orderService.createOrder(
                 request.customerId(), request.productId(), request.quantity(), request.amount());
+        Span.current().setAttribute("orderId", order.getId());
         OrderResponse response = new OrderResponse(
                 order.getId(), order.getCustomerId(), order.getProductId(), order.getQuantity(),
                 order.getAmount(), order.getStatus());

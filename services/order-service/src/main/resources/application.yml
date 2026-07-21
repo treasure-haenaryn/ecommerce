@@ -14,7 +14,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false   # SQL 로깅은 logback-spring.xml(org.hibernate.SQL 로거)이 담당 - Outbox 폴링 쿼리만 필터로 제외됨
     open-in-view: false
 
   kafka:
@@ -27,3 +27,11 @@ management:
     web:
       exposure:
         include: health,info
+  tracing:
+    sampling:
+      probability: 1.0   # 로컬 검증 단계라 100% 샘플링 (운영에서는 낮춰야 함)
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/traces

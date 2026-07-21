@@ -2,6 +2,7 @@ package io.github.treasurehaenaryn.msa.shipping.application;
 
 import io.github.treasurehaenaryn.msa.common.events.EventTypes;
 import io.github.treasurehaenaryn.msa.common.events.payload.ShippingStartedPayload;
+import io.github.treasurehaenaryn.msa.common.kafka.TraceContextCarrier;
 import io.github.treasurehaenaryn.msa.shipping.domain.Shipment;
 import io.github.treasurehaenaryn.msa.shipping.infrastructure.persistence.OutboxEvent;
 import io.github.treasurehaenaryn.msa.shipping.infrastructure.persistence.OutboxEventRepository;
@@ -24,15 +25,18 @@ public class ShippingService {
     private final OutboxEventRepository outboxEventRepository;
     private final ProcessedEventRepository processedEventRepository;
     private final ObjectMapper objectMapper;
+    private final TraceContextCarrier traceContextCarrier;
 
     public ShippingService(ShipmentRepository shipmentRepository,
                             OutboxEventRepository outboxEventRepository,
                             ProcessedEventRepository processedEventRepository,
-                            ObjectMapper objectMapper) {
+                            ObjectMapper objectMapper,
+                            TraceContextCarrier traceContextCarrier) {
         this.shipmentRepository = shipmentRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.processedEventRepository = processedEventRepository;
         this.objectMapper = objectMapper;
+        this.traceContextCarrier = traceContextCarrier;
     }
 
     @Transactional
@@ -53,7 +57,8 @@ public class ShippingService {
     private void saveOutboxEvent(String aggregateType, String aggregateId, String eventType, Object payload) {
         try {
             String payloadJson = objectMapper.writeValueAsString(payload);
-            outboxEventRepository.save(OutboxEvent.create(aggregateType, aggregateId, eventType, payloadJson));
+            String traceparent = traceContextCarrier.capture();
+            outboxEventRepository.save(OutboxEvent.create(aggregateType, aggregateId, eventType, payloadJson, traceparent));
         } catch (JacksonException e) {
             throw new IllegalStateException("Outbox payload 직렬화 실패: " + eventType, e);
         }

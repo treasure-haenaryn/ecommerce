@@ -1,11 +1,13 @@
 package io.github.treasurehaenaryn.msa.common.kafka;
 
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -24,6 +26,7 @@ import java.util.Map;
  */
 @AutoConfiguration
 @ConditionalOnClass(ConsumerFactory.class)
+@EnableKafka
 public class KafkaConsumerConfig {
 
     @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
@@ -50,17 +53,19 @@ public class KafkaConsumerConfig {
     public DefaultErrorHandler kafkaErrorHandler(KafkaTemplate<String, Object> kafkaTemplate) {
         var recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate,
                 (record, ex) -> new org.apache.kafka.common.TopicPartition(record.topic() + ".DLT", record.partition()));
-        var errorHandler = new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 3L));
-        return errorHandler;
+        return new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 3L));
     }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
             ConsumerFactory<String, Object> consumerFactory,
-            DefaultErrorHandler kafkaErrorHandler) {
+            DefaultErrorHandler kafkaErrorHandler,
+            ObservationRegistry observationRegistry) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setCommonErrorHandler(kafkaErrorHandler);
+        factory.getContainerProperties().setObservationEnabled(true);
+        factory.getContainerProperties().setObservationRegistry(observationRegistry);
         return factory;
     }
 }

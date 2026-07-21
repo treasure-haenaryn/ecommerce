@@ -4,6 +4,7 @@ import io.github.treasurehaenaryn.msa.common.events.EventEnvelope;
 import io.github.treasurehaenaryn.msa.common.events.KafkaTopics;
 import io.github.treasurehaenaryn.msa.common.events.payload.PaymentCompletedPayload;
 import io.github.treasurehaenaryn.msa.inventory.application.InventoryService;
+import io.opentelemetry.api.trace.Span;
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,7 @@ public class InventoryEventListener {
     @KafkaListener(topics = KafkaTopics.PAYMENT_COMPLETED)
     public void onPaymentCompleted(EventEnvelope<?> envelope) {
         PaymentCompletedPayload payload = objectMapper.convertValue(envelope.payload(), PaymentCompletedPayload.class);
+        Span.current().setAttribute("orderId", payload.orderId());
         inventoryService.handlePaymentCompleted(
                 envelope.eventId(), payload.orderId(), payload.productId(), payload.quantity());
     }

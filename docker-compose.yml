@@ -44,5 +44,25 @@ services:
       - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql   # 서비스별 DB 5개 생성
       - postgres-data:/var/lib/postgresql/data
 
+  grafana-lgtm:
+    image: grafana/otel-lgtm:latest   # Loki(로그)+Grafana(시각화)+Tempo(트레이스)+Prometheus(메트릭) 올인원, 로컬 검증용
+    container_name: grafana-lgtm
+    ports:
+      - "3000:3000"   # Grafana UI만 호스트에 노출
+    # 4317/4318은 호스트에 안 열어둠 - 이제 앱들은 grafana-lgtm에 직접 안 쏘고 otel-collector를 거침
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest   # 각 서비스와 Tempo 사이의 중계 서버 - 버퍼링/재시도/배치를 더 안정적으로 처리
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./docker/otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"   # 앱들이 이제 이 포트로 쏨 (OTLP gRPC)
+      - "4318:4318"   # OTLP HTTP
+    depends_on:
+      - grafana-lgtm   # 컸테이너 시작 순서만 보장. grafana-lgtm이 아직 준비 안 되어있어도,
+    # otel-collector의 gRPC 클라이언트가 연결 실패 시 자동으로 백그라운드 재시도하므로 별도 헬스체크 불필요
+
 volumes:
   postgres-data:

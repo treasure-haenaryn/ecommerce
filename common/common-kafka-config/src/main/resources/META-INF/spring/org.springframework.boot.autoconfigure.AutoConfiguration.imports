@@ -1,2 +1,3 @@
 io.github.treasurehaenaryn.msa.common.kafka.KafkaProducerConfig
 io.github.treasurehaenaryn.msa.common.kafka.KafkaConsumerConfig
+io.github.treasurehaenaryn.msa.common.kafka.TraceContextAutoConfiguration

@@ -209,3 +209,6 @@ gradle-app.setting
 
 # 리팩토링 과정에서 남긴 이전 버전 참고용 코드 (커밋 대상 아님)
 _deprecated-events-v1/
+
+# start-services.sh가 만드는 실행 로그/PID 파일
+logs/
